@@ -51,5 +51,6 @@ Tier 5 gear without excluding legacy items that do not have a gear tier.
 The script only fills DIM's search box. It does not tag, move, lock, unlock, or
 dismantle items automatically.
 
-Use the panel's **Hide** button to collapse it into a small **Show DIM Helper**
-button. The hidden or visible state is remembered across DIM reloads.
+Use the full-width **Hide Helper** button to collapse the panel into a small
+**Show DIM Helper** button. The hidden or visible state is remembered across DIM
+reloads.

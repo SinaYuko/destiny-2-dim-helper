@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DIM Power Search Helper
 // @namespace    local.destiny2helper
-// @version      1.11.0
+// @version      1.12.0
 // @description  Adds named DIM searches that automatically use your displayed maximum power.
 // @homepageURL  https://github.com/SinaYuko/destiny-2-dim-helper
 // @supportURL   https://github.com/SinaYuko/destiny-2-dim-helper/issues
@@ -107,10 +107,9 @@
       font-weight: 700;
     }
     #dim-power-search-helper .dpsh-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
+      margin-bottom: 8px;
+    }
+    #dim-power-search-helper .dpsh-title {
       margin-bottom: 8px;
     }
     #dim-power-search-helper .dpsh-row {
@@ -145,11 +144,12 @@
       background: #50545d;
     }
     #dim-power-search-helper .dpsh-toggle {
-      width: auto;
+      width: 100%;
       margin: 0;
-      padding: 4px 7px;
-      background: #50545d;
-      font-size: 11px;
+      padding: 7px;
+      border: 1px solid #9da4b2;
+      background: #353942;
+      font-size: 12px;
     }
     #dim-power-search-helper.dpsh-hidden {
       width: auto;
@@ -168,6 +168,7 @@
       display: none;
     }
     #dim-power-search-helper.dpsh-hidden .dpsh-toggle {
+      width: auto;
       padding: 8px 10px;
       background: #4d78cc;
       font-size: 12px;
@@ -241,7 +242,11 @@
 
   function setPanelHidden(hidden) {
     panel.classList.toggle('dpsh-hidden', hidden);
-    toggleButton.textContent = hidden ? 'Show DIM Helper' : 'Hide';
+    toggleButton.textContent = hidden ? 'Show DIM Helper' : 'Hide Helper';
+    toggleButton.setAttribute(
+      'aria-label',
+      hidden ? 'Show DIM Power Search Helper' : 'Hide DIM Power Search Helper',
+    );
     toggleButton.setAttribute('aria-expanded', String(!hidden));
     saveHiddenState(hidden);
   }
@@ -420,7 +425,7 @@
     panel.innerHTML = `
       <div class="dpsh-header">
         <div class="dpsh-title">DIM Power Searches</div>
-        <button class="dpsh-toggle" type="button" aria-expanded="true">Hide</button>
+        <button class="dpsh-toggle" type="button" aria-expanded="true">Hide Helper</button>
       </div>
       <div class="dpsh-content">
         <div class="dpsh-row">
