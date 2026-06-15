@@ -50,27 +50,3 @@ Tier 5 gear without excluding legacy items that do not have a gear tier.
 
 The script only fills DIM's search box. It does not tag, move, lock, unlock, or
 dismantle items automatically.
-
-## Plain-Language Explanation
-
-This helper is a set of shortcuts for organizing a Destiny 2 inventory. Each
-button replaces DIM's current search with a named filter. Some searches find
-low-value equipment to review, while others find duplicates, unfinished weapon
-upgrades, or equipment that should be moved back into storage.
-
-Nothing is deleted or changed automatically. The player still reviews the
-results and chooses what to tag, move, upgrade, or dismantle.
-
-The player uses `Keep`, `Favorite`, and `Archive` tags as protection:
-
-- `Keep` and `Favorite` mean the item should not appear in cleanup results.
-- `Archive` means the player is temporarily keeping an older item until a newer
-  gear-tier version drops.
-- Tier 4 and Tier 5 items are protected from destructive cleanup searches.
-- Green/Uncommon equipment and the unusual weapon Ergo Sum are ignored by most
-  review searches, but can still be moved into the vault.
-
-The archived-replacement button only finds archived items that have another copy.
-DIM cannot confirm through search syntax that the other copy has Tier 1 or
-higher, so the player must compare those copies manually before removing the
-Archive tag.
