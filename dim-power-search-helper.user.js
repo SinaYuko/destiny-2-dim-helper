@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DIM Power Search Helper
 // @namespace    local.destiny2helper
-// @version      1.10.0
+// @version      1.11.0
 // @description  Adds named DIM searches that automatically use your displayed maximum power.
 // @homepageURL  https://github.com/SinaYuko/destiny-2-dim-helper
 // @supportURL   https://github.com/SinaYuko/destiny-2-dim-helper/issues
@@ -20,6 +20,7 @@
   'use strict';
 
   const STORAGE_KEY = 'dim-power-search-helper-threshold';
+  const HIDDEN_STORAGE_KEY = 'dim-power-search-helper-hidden';
   const MIN_POWER = 1;
   const MAX_POWER = 9999;
   let powerObserver = null;
@@ -103,8 +104,14 @@
     }
     #dim-power-search-helper * { box-sizing: border-box; }
     #dim-power-search-helper .dpsh-title {
-      margin-bottom: 8px;
       font-weight: 700;
+    }
+    #dim-power-search-helper .dpsh-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
     }
     #dim-power-search-helper .dpsh-row {
       display: flex;
@@ -137,6 +144,34 @@
       margin: 0;
       background: #50545d;
     }
+    #dim-power-search-helper .dpsh-toggle {
+      width: auto;
+      margin: 0;
+      padding: 4px 7px;
+      background: #50545d;
+      font-size: 11px;
+    }
+    #dim-power-search-helper.dpsh-hidden {
+      width: auto;
+      max-height: none;
+      overflow: visible;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+    #dim-power-search-helper.dpsh-hidden .dpsh-header {
+      margin: 0;
+    }
+    #dim-power-search-helper.dpsh-hidden .dpsh-title,
+    #dim-power-search-helper.dpsh-hidden .dpsh-content {
+      display: none;
+    }
+    #dim-power-search-helper.dpsh-hidden .dpsh-toggle {
+      padding: 8px 10px;
+      background: #4d78cc;
+      font-size: 12px;
+    }
     #dim-power-search-helper .dpsh-status {
       min-height: 18px;
       margin-top: 8px;
@@ -149,6 +184,7 @@
   let powerInput;
   let status;
   let buttons;
+  let toggleButton;
 
   function validPower(value) {
     const number = Number.parseInt(String(value), 10);
@@ -177,6 +213,37 @@
         // The panel still works for this page even when storage is unavailable.
       }
     }
+  }
+
+  function savedHiddenState() {
+    try {
+      return Boolean(GM_getValue(HIDDEN_STORAGE_KEY, false));
+    } catch {
+      try {
+        return localStorage.getItem(HIDDEN_STORAGE_KEY) === 'true';
+      } catch {
+        return false;
+      }
+    }
+  }
+
+  function saveHiddenState(hidden) {
+    try {
+      GM_setValue(HIDDEN_STORAGE_KEY, hidden);
+    } catch {
+      try {
+        localStorage.setItem(HIDDEN_STORAGE_KEY, String(hidden));
+      } catch {
+        // The hide control still works for this page when storage is unavailable.
+      }
+    }
+  }
+
+  function setPanelHidden(hidden) {
+    panel.classList.toggle('dpsh-hidden', hidden);
+    toggleButton.textContent = hidden ? 'Show DIM Helper' : 'Hide';
+    toggleButton.setAttribute('aria-expanded', String(!hidden));
+    saveHiddenState(hidden);
   }
 
   function setPower(power, message) {
@@ -351,19 +418,30 @@
     panel = document.createElement('section');
     panel.id = 'dim-power-search-helper';
     panel.innerHTML = `
-      <div class="dpsh-title">DIM Power Searches</div>
-      <div class="dpsh-row">
-        <input class="dpsh-power" inputmode="numeric" aria-label="Power threshold">
-        <button class="dpsh-detect" type="button">Detect</button>
+      <div class="dpsh-header">
+        <div class="dpsh-title">DIM Power Searches</div>
+        <button class="dpsh-toggle" type="button" aria-expanded="true">Hide</button>
       </div>
-      <div class="dpsh-buttons"></div>
-      <div class="dpsh-status" aria-live="polite"></div>
+      <div class="dpsh-content">
+        <div class="dpsh-row">
+          <input class="dpsh-power" inputmode="numeric" aria-label="Power threshold">
+          <button class="dpsh-detect" type="button">Detect</button>
+        </div>
+        <div class="dpsh-buttons"></div>
+        <div class="dpsh-status" aria-live="polite"></div>
+      </div>
     `;
     document.body.appendChild(panel);
 
     powerInput = panel.querySelector('.dpsh-power');
     status = panel.querySelector('.dpsh-status');
     buttons = panel.querySelector('.dpsh-buttons');
+    toggleButton = panel.querySelector('.dpsh-toggle');
+
+    toggleButton.addEventListener('click', () => {
+      setPanelHidden(!panel.classList.contains('dpsh-hidden'));
+    });
+    setPanelHidden(savedHiddenState());
 
     for (const search of searches) {
       const button = document.createElement('button');

@@ -4,7 +4,7 @@ $scriptPath = Join-Path $PSScriptRoot 'dim-power-search-helper.user.js'
 $content = Get-Content -Raw -LiteralPath $scriptPath
 
 $requiredFragments = @(
-    '// @version      1.10.0'
+    '// @version      1.11.0'
     '// @updateURL    https://raw.githubusercontent.com/SinaYuko/destiny-2-dim-helper/main/dim-power-search-helper.user.js'
     '// @downloadURL  https://raw.githubusercontent.com/SinaYuko/destiny-2-dim-helper/main/dim-power-search-helper.user.js'
     '// @match        https://*.destinyitemmanager.com/*'
@@ -28,6 +28,10 @@ $requiredFragments = @(
     'if (!search.requiresPower)'
     'bottom: 14px'
     'max-height: calc(100vh - 28px)'
+    "const HIDDEN_STORAGE_KEY = 'dim-power-search-helper-hidden'"
+    "toggleButton.textContent = hidden ? 'Show DIM Helper' : 'Hide'"
+    "panel.classList.toggle('dpsh-hidden', hidden)"
+    'setPanelHidden(savedHiddenState())'
     "if (!document.getElementById('dim-power-search-helper'))"
 )
 
