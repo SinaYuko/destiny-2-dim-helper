@@ -4,7 +4,7 @@ $scriptPath = Join-Path $PSScriptRoot 'dim-power-search-helper.user.js'
 $content = Get-Content -Raw -LiteralPath $scriptPath
 
 $requiredFragments = @(
-    '// @version      1.12.0'
+    '// @version      1.13.0'
     '// @updateURL    https://raw.githubusercontent.com/SinaYuko/destiny-2-dim-helper/main/dim-power-search-helper.user.js'
     '// @downloadURL  https://raw.githubusercontent.com/SinaYuko/destiny-2-dim-helper/main/dim-power-search-helper.user.js'
     '// @match        https://*.destinyitemmanager.com/*'
@@ -20,6 +20,9 @@ $requiredFragments = @(
     '/* Move Unequipped Gear to Vault */ is:equipment is:movable -is:equipped -is:invault -is:postmaster'
     '/* Duplicate Weapons */ is:weapon is:dupe -is:uncommon'
     '-exactname:"Ergo Sum" -tag:favorite -tag:archive'
+    '/* Unlocked Armor Below Tier 5 Trash Review */ is:armor tier:<=4'
+    '-is:uncommon -tag:favorite -tag:keep -tag:archive -is:locked'
+    '/* Duplicate Armor */ is:armor is:dupe -is:uncommon'
     '/* Archived Gear With Another Copy - Compare Tiers */ is:equipment'
     'is:dupe tag:archive tier:<=3 -is:uncommon -exactname:"Ergo Sum"'
     '/* Missing Catalysts */ catalyst:missing -is:uncommon -exactname:"Ergo Sum"'
@@ -48,8 +51,8 @@ if ($powerSearchCount -ne 3) {
 }
 
 $uncommonExclusionCount = ([regex]::Matches($content, '-is:uncommon')).Count
-if ($uncommonExclusionCount -ne 8) {
-    throw "Expected 8 searches to exclude Uncommon gear, found $uncommonExclusionCount."
+if ($uncommonExclusionCount -ne 10) {
+    throw "Expected 10 searches to exclude Uncommon gear, found $uncommonExclusionCount."
 }
 
 $ergoSumExclusionCount = ([regex]::Matches($content, '-exactname:"Ergo Sum"')).Count
@@ -58,8 +61,8 @@ if ($ergoSumExclusionCount -ne 8) {
 }
 
 $archiveExclusionCount = ([regex]::Matches($content, '-tag:archive')).Count
-if ($archiveExclusionCount -ne 3) {
-    throw "Expected 3 searches to protect Archive gear, found $archiveExclusionCount."
+if ($archiveExclusionCount -ne 5) {
+    throw "Expected 5 searches to protect Archive gear, found $archiveExclusionCount."
 }
 
 $moveQuery = '/* Move Unequipped Gear to Vault */ is:equipment is:movable -is:equipped -is:invault -is:postmaster'

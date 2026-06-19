@@ -10,14 +10,18 @@ The userscript adds a small panel to DIM with these searches:
   protecting Tier 4 and Tier 5 gear.
 - Move unequipped gear outside the vault and postmaster back to the vault.
 - Find duplicate weapons while excluding Favorite-tagged copies.
+- Find unlocked armor below Tier 5 while protecting Keep/Favorite tags, Archive
+  tags, and locked items.
+- Find duplicate armor while excluding Favorite-tagged and Archive-tagged copies.
 - Find archived Tier 1-3 gear that has another copy for replacement review.
 - Find weapons with missing catalysts.
 - Find weapons with unfinished catalysts.
 - Find crafted weapons below level 17.
 
-All review searches exclude green/Uncommon gear with `-is:uncommon` and exclude
-Ergo Sum with `-exactname:"Ergo Sum"`. The unequipped-gear movement search
-intentionally includes both so they can still be returned to the vault.
+All review searches exclude green/Uncommon gear with `-is:uncommon`. Weapon and
+general equipment review searches also exclude Ergo Sum with
+`-exactname:"Ergo Sum"`. The unequipped-gear movement search intentionally
+includes both so they can still be returned to the vault.
 
 The `archive` tag means the item is intentionally retained until a higher-tier
 replacement drops. Trash, infusion-candidate, and duplicate-review searches
