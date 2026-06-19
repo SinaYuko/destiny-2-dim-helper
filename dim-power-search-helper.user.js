@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DIM Power Search Helper
 // @namespace    local.destiny2helper
-// @version      1.16.0
+// @version      1.17.0
 // @description  Adds named DIM searches that automatically use your displayed maximum power.
 // @homepageURL  https://github.com/SinaYuko/destiny-2-dim-helper
 // @supportURL   https://github.com/SinaYuko/destiny-2-dim-helper/issues
@@ -64,9 +64,8 @@
     {
       label: 'Trash Below Tier 4',
       query: () =>
-        '/* Unlocked Gear Below Tier 4 Trash Review */ is:equipment tier:<=3 ' +
-        '-is:uncommon -exactname:"Ergo Sum" -tag:favorite -tag:keep ' +
-        '-tag:archive -is:locked',
+        '/* Gear Below Tier 4 Trash Review */ is:equipment tier:<=3 ' +
+        '-tag:favorite',
     },
     {
       label: 'Trash Armor Below Tier 5',

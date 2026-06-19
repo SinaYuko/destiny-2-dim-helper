@@ -4,7 +4,7 @@ $scriptPath = Join-Path $PSScriptRoot 'dim-power-search-helper.user.js'
 $content = Get-Content -Raw -LiteralPath $scriptPath
 
 $requiredFragments = @(
-    '// @version      1.16.0'
+    '// @version      1.17.0'
     '// @updateURL    https://raw.githubusercontent.com/SinaYuko/destiny-2-dim-helper/main/dim-power-search-helper.user.js'
     '// @downloadURL  https://raw.githubusercontent.com/SinaYuko/destiny-2-dim-helper/main/dim-power-search-helper.user.js'
     '// @match        https://*.destinyitemmanager.com/*'
@@ -20,7 +20,8 @@ $requiredFragments = @(
     '/* Move Unequipped Gear to Vault */ is:equipment is:movable -is:equipped -is:invault -is:postmaster'
     '/* Duplicate Weapons */ is:weapon is:dupe -is:uncommon'
     '-exactname:"Ergo Sum" -tag:favorite -tag:archive'
-    '/* Unlocked Gear Below Tier 4 Trash Review */ is:equipment tier:<=3'
+    '/* Gear Below Tier 4 Trash Review */ is:equipment tier:<=3'
+    '-tag:favorite'
     '/* Armor Below Tier 5 Trash Review */ is:armor tier:<=4'
     '-is:uncommon -tag:favorite'
     '/* Duplicate Armor */ is:armor is:dupe -is:uncommon'
@@ -52,18 +53,34 @@ if ($powerSearchCount -ne 3) {
 }
 
 $uncommonExclusionCount = ([regex]::Matches($content, '-is:uncommon')).Count
-if ($uncommonExclusionCount -ne 11) {
-    throw "Expected 11 searches to exclude Uncommon gear, found $uncommonExclusionCount."
+if ($uncommonExclusionCount -ne 10) {
+    throw "Expected 10 searches to exclude Uncommon gear, found $uncommonExclusionCount."
 }
 
 $ergoSumExclusionCount = ([regex]::Matches($content, '-exactname:"Ergo Sum"')).Count
-if ($ergoSumExclusionCount -ne 9) {
-    throw "Expected 9 searches to exclude Ergo Sum, found $ergoSumExclusionCount."
+if ($ergoSumExclusionCount -ne 8) {
+    throw "Expected 8 searches to exclude Ergo Sum, found $ergoSumExclusionCount."
 }
 
 $archiveExclusionCount = ([regex]::Matches($content, '-tag:archive')).Count
-if ($archiveExclusionCount -ne 5) {
-    throw "Expected 5 searches to protect Archive gear, found $archiveExclusionCount."
+if ($archiveExclusionCount -ne 4) {
+    throw "Expected 4 searches to protect Archive gear, found $archiveExclusionCount."
+}
+
+$tierFourCleanupMatch = [regex]::Match(
+    $content,
+    "label:\s*'Trash Below Tier 4'.*?query:\s*\(\)\s*=>\s*'([^']+)'\s*\+\s*'([^']+)'",
+    [System.Text.RegularExpressions.RegexOptions]::Singleline
+)
+if (-not $tierFourCleanupMatch.Success) {
+    throw 'Could not find the Tier 4 cleanup query.'
+}
+
+$tierFourCleanupQuery = $tierFourCleanupMatch.Groups[1].Value + $tierFourCleanupMatch.Groups[2].Value
+foreach ($blockedProtection in @('-is:uncommon', '-exactname:"Ergo Sum"', '-tag:keep', '-tag:archive', '-is:locked')) {
+    if ($tierFourCleanupQuery.Contains($blockedProtection)) {
+        throw "Tier 4 cleanup must not skip $blockedProtection."
+    }
 }
 
 $armorCleanupMatch = [regex]::Match(
