@@ -4,7 +4,7 @@ $scriptPath = Join-Path $PSScriptRoot 'dim-power-search-helper.user.js'
 $content = Get-Content -Raw -LiteralPath $scriptPath
 
 $requiredFragments = @(
-    '// @version      1.22.0'
+    '// @version      1.23.0'
     '// @updateURL    https://raw.githubusercontent.com/SinaYuko/destiny-2-dim-helper/main/dim-power-search-helper.user.js'
     '// @downloadURL  https://raw.githubusercontent.com/SinaYuko/destiny-2-dim-helper/main/dim-power-search-helper.user.js'
     '// @match        https://*.destinyitemmanager.com/*'
@@ -75,7 +75,7 @@ if ($archiveExclusionCount -ne 7) {
 
 $tierFourCleanupMatch = [regex]::Match(
     $content,
-    "label:\s*'Trash Below Tier 4'.*?query:\s*\(\)\s*=>\s*'([^']+)'\s*\+\s*'([^']+)'",
+    "label:\s*'Trash Armor Below Tier 4'.*?query:\s*\(\)\s*=>\s*'([^']+)'\s*\+\s*'([^']+)'",
     [System.Text.RegularExpressions.RegexOptions]::Singleline
 )
 if (-not $tierFourCleanupMatch.Success) {
@@ -125,7 +125,7 @@ if (-not $armorCleanupQuery.Contains('-is:exotic')) {
 
 $tierFourKeepMatch = [regex]::Match(
     $content,
-    "label:\s*'Tag Tier 4 Armor Keep'.*?query:\s*\(\)\s*=>\s*'([^']+)'\s*\+\s*'([^']+)'",
+    "label:\s*'Mark Tier 4 Armor Keep'.*?query:\s*\(\)\s*=>\s*'([^']+)'\s*\+\s*'([^']+)'",
     [System.Text.RegularExpressions.RegexOptions]::Singleline
 )
 if (-not $tierFourKeepMatch.Success) {
@@ -146,7 +146,7 @@ foreach ($blockedFilter in @('-tag:archive', '-is:locked')) {
 
 $tierFiveFavoriteMatch = [regex]::Match(
     $content,
-    "label:\s*'Tag Tier 5 Armor Favorite'.*?query:\s*\(\)\s*=>\s*'([^']+)'\s*\+\s*'([^']+)'",
+    "label:\s*'Mark Tier 5 Armor Favorite'.*?query:\s*\(\)\s*=>\s*'([^']+)'\s*\+\s*'([^']+)'",
     [System.Text.RegularExpressions.RegexOptions]::Singleline
 )
 if (-not $tierFiveFavoriteMatch.Success) {
