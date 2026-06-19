@@ -13,6 +13,8 @@ The userscript adds a small panel to DIM with these searches:
 - Find non-Exotic armor below Tier 4 while protecting only Favorite-tagged gear.
 - Find non-Exotic armor below Tier 5 while protecting only Favorite-tagged
   armor.
+- Find non-Exotic Tier 3 armor with no duplicate copy so it can be reviewed for
+  Archive tagging.
 - Find duplicate armor while excluding Favorite-tagged and Archive-tagged copies.
 - Find archived Tier 1-3 gear that has another copy for replacement review.
 - Find weapons with missing catalysts.

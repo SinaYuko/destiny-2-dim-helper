@@ -4,7 +4,7 @@ $scriptPath = Join-Path $PSScriptRoot 'dim-power-search-helper.user.js'
 $content = Get-Content -Raw -LiteralPath $scriptPath
 
 $requiredFragments = @(
-    '// @version      1.19.0'
+    '// @version      1.20.0'
     '// @updateURL    https://raw.githubusercontent.com/SinaYuko/destiny-2-dim-helper/main/dim-power-search-helper.user.js'
     '// @downloadURL  https://raw.githubusercontent.com/SinaYuko/destiny-2-dim-helper/main/dim-power-search-helper.user.js'
     '// @match        https://*.destinyitemmanager.com/*'
@@ -24,6 +24,8 @@ $requiredFragments = @(
     '-is:exotic -tag:favorite'
     '/* Armor Below Tier 5 Trash Review */ is:armor tier:<=4'
     '-is:uncommon -is:exotic -tag:favorite'
+    '/* Tier 3 Armor Without Duplicates - Archive Candidates */'
+    'is:armor tier:3 -is:dupe -is:exotic -tag:favorite -tag:archive'
     '/* Duplicate Armor */ is:armor is:dupe -is:uncommon'
     '/* Archived Gear With Another Copy - Compare Tiers */ is:equipment'
     'is:dupe tag:archive tier:<=3 -is:uncommon -exactname:"Ergo Sum"'
@@ -63,8 +65,8 @@ if ($ergoSumExclusionCount -ne 8) {
 }
 
 $archiveExclusionCount = ([regex]::Matches($content, '-tag:archive')).Count
-if ($archiveExclusionCount -ne 4) {
-    throw "Expected 4 searches to protect Archive gear, found $archiveExclusionCount."
+if ($archiveExclusionCount -ne 5) {
+    throw "Expected 5 searches to protect Archive gear, found $archiveExclusionCount."
 }
 
 $tierFourCleanupMatch = [regex]::Match(
@@ -109,6 +111,22 @@ foreach ($blockedProtection in @('-tag:keep', '-tag:archive', '-is:locked')) {
 }
 if (-not $armorCleanupQuery.Contains('-is:exotic')) {
     throw 'Armor cleanup must ignore Exotics.'
+}
+
+$archiveSinglesMatch = [regex]::Match(
+    $content,
+    "label:\s*'Archive Tier 3 Armor Singles'.*?query:\s*\(\)\s*=>\s*'([^']+)'\s*\+\s*'([^']+)'",
+    [System.Text.RegularExpressions.RegexOptions]::Singleline
+)
+if (-not $archiveSinglesMatch.Success) {
+    throw 'Could not find the Tier 3 archive candidate query.'
+}
+
+$archiveSinglesQuery = $archiveSinglesMatch.Groups[1].Value + $archiveSinglesMatch.Groups[2].Value
+foreach ($requiredFilter in @('is:armor tier:3', '-is:dupe', '-is:exotic', '-tag:favorite', '-tag:archive')) {
+    if (-not $archiveSinglesQuery.Contains($requiredFilter)) {
+        throw "Tier 3 archive candidates must include $requiredFilter."
+    }
 }
 
 $moveQuery = '/* Move Unequipped Gear to Vault */ is:equipment is:movable -is:equipped -is:invault -is:postmaster'

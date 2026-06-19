@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DIM Power Search Helper
 // @namespace    local.destiny2helper
-// @version      1.19.0
+// @version      1.20.0
 // @description  Adds named DIM searches that automatically use your displayed maximum power.
 // @homepageURL  https://github.com/SinaYuko/destiny-2-dim-helper
 // @supportURL   https://github.com/SinaYuko/destiny-2-dim-helper/issues
@@ -72,6 +72,12 @@
       query: () =>
         '/* Armor Below Tier 5 Trash Review */ is:armor tier:<=4 ' +
         '-is:uncommon -is:exotic -tag:favorite',
+    },
+    {
+      label: 'Archive Tier 3 Armor Singles',
+      query: () =>
+        '/* Tier 3 Armor Without Duplicates - Archive Candidates */ ' +
+        'is:armor tier:3 -is:dupe -is:exotic -tag:favorite -tag:archive',
     },
     {
       label: 'Duplicate Armor',
