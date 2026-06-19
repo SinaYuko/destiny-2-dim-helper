@@ -4,7 +4,7 @@ $scriptPath = Join-Path $PSScriptRoot 'dim-power-search-helper.user.js'
 $content = Get-Content -Raw -LiteralPath $scriptPath
 
 $requiredFragments = @(
-    '// @version      1.20.0'
+    '// @version      1.21.0'
     '// @updateURL    https://raw.githubusercontent.com/SinaYuko/destiny-2-dim-helper/main/dim-power-search-helper.user.js'
     '// @downloadURL  https://raw.githubusercontent.com/SinaYuko/destiny-2-dim-helper/main/dim-power-search-helper.user.js'
     '// @match        https://*.destinyitemmanager.com/*'
@@ -21,9 +21,9 @@ $requiredFragments = @(
     '/* Duplicate Weapons */ is:weapon is:dupe -is:uncommon'
     '-exactname:"Ergo Sum" -tag:favorite -tag:archive'
     '/* Armor Below Tier 4 Trash Review */ is:armor tier:<=3'
-    '-is:exotic -tag:favorite'
+    '-is:exotic -tag:favorite -tag:archive'
     '/* Armor Below Tier 5 Trash Review */ is:armor tier:<=4'
-    '-is:uncommon -is:exotic -tag:favorite'
+    '-is:uncommon -is:exotic -tag:favorite -tag:archive'
     '/* Tier 3 Armor Without Duplicates - Archive Candidates */'
     'is:armor tier:3 -is:dupe -is:exotic -tag:favorite -tag:archive'
     '/* Duplicate Armor */ is:armor is:dupe -is:uncommon'
@@ -65,8 +65,8 @@ if ($ergoSumExclusionCount -ne 8) {
 }
 
 $archiveExclusionCount = ([regex]::Matches($content, '-tag:archive')).Count
-if ($archiveExclusionCount -ne 5) {
-    throw "Expected 5 searches to protect Archive gear, found $archiveExclusionCount."
+if ($archiveExclusionCount -ne 7) {
+    throw "Expected 7 searches to protect Archive gear, found $archiveExclusionCount."
 }
 
 $tierFourCleanupMatch = [regex]::Match(
@@ -79,10 +79,13 @@ if (-not $tierFourCleanupMatch.Success) {
 }
 
 $tierFourCleanupQuery = $tierFourCleanupMatch.Groups[1].Value + $tierFourCleanupMatch.Groups[2].Value
-foreach ($blockedProtection in @('-is:uncommon', '-exactname:"Ergo Sum"', '-tag:keep', '-tag:archive', '-is:locked')) {
+foreach ($blockedProtection in @('-is:uncommon', '-exactname:"Ergo Sum"', '-tag:keep', '-is:locked')) {
     if ($tierFourCleanupQuery.Contains($blockedProtection)) {
         throw "Tier 4 cleanup must not skip $blockedProtection."
     }
+}
+if (-not $tierFourCleanupQuery.Contains('-tag:archive')) {
+    throw 'Tier 4 cleanup must respect Archive-tagged gear.'
 }
 if (-not $tierFourCleanupQuery.Contains('-is:exotic')) {
     throw 'Tier 4 cleanup must ignore Exotics.'
@@ -104,10 +107,13 @@ if (-not $armorCleanupMatch.Success) {
 }
 
 $armorCleanupQuery = $armorCleanupMatch.Groups[1].Value + $armorCleanupMatch.Groups[2].Value
-foreach ($blockedProtection in @('-tag:keep', '-tag:archive', '-is:locked')) {
+foreach ($blockedProtection in @('-tag:keep', '-is:locked')) {
     if ($armorCleanupQuery.Contains($blockedProtection)) {
         throw "Armor cleanup must not skip $blockedProtection."
     }
+}
+if (-not $armorCleanupQuery.Contains('-tag:archive')) {
+    throw 'Armor cleanup must respect Archive-tagged gear.'
 }
 if (-not $armorCleanupQuery.Contains('-is:exotic')) {
     throw 'Armor cleanup must ignore Exotics.'

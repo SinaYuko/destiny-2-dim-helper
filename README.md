@@ -10,9 +10,10 @@ The userscript adds a small panel to DIM with these searches:
   protecting Tier 4 and Tier 5 gear.
 - Move unequipped gear outside the vault and postmaster back to the vault.
 - Find duplicate weapons while excluding Favorite-tagged copies.
-- Find non-Exotic armor below Tier 4 while protecting only Favorite-tagged gear.
-- Find non-Exotic armor below Tier 5 while protecting only Favorite-tagged
-  armor.
+- Find non-Exotic armor below Tier 4 while protecting Favorite-tagged and
+  Archive-tagged gear.
+- Find non-Exotic armor below Tier 5 while protecting Favorite-tagged and
+  Archive-tagged armor.
 - Find non-Exotic Tier 3 armor with no duplicate copy so it can be reviewed for
   Archive tagging.
 - Find duplicate armor while excluding Favorite-tagged and Archive-tagged copies.
