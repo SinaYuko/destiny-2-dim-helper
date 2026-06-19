@@ -4,14 +4,14 @@ $scriptPath = Join-Path $PSScriptRoot 'dim-power-search-helper.user.js'
 $content = Get-Content -Raw -LiteralPath $scriptPath
 
 $requiredFragments = @(
-    '// @version      1.27.0'
+    '// @version      1.28.0'
     '// @updateURL    https://raw.githubusercontent.com/SinaYuko/destiny-2-dim-helper/main/dim-power-search-helper.user.js'
     '// @downloadURL  https://raw.githubusercontent.com/SinaYuko/destiny-2-dim-helper/main/dim-power-search-helper.user.js'
     '// @match        https://*.destinyitemmanager.com/*'
     '/* Below ${power} - Unlocked Trash Review */ is:equipment power:<${power}'
     '-is:uncommon -exactname:"Ergo Sum" -tier:>=4 -tag:favorite -tag:keep'
     '-tag:archive -is:locked'
-    '/* Junk Below ${power} - Trash Review */ is:equipment tag:junk power:<${power}'
+    '/* Junk Tag Trash Review */ tag:junk'
     '/* Find Infusion Gear or Equipped Gear Needing Power */ is:equipment'
     '((power:>=${power} -is:locked) or (is:equipped power:<${power}))'
     '[aria-label*="account power" i]'
@@ -66,23 +66,23 @@ foreach ($fragment in $requiredFragments) {
 }
 
 $powerSearchCount = ([regex]::Matches($content, 'requiresPower:\s*true')).Count
-if ($powerSearchCount -ne 4) {
-    throw "Expected exactly 4 power-dependent searches, found $powerSearchCount."
+if ($powerSearchCount -ne 3) {
+    throw "Expected exactly 3 power-dependent searches, found $powerSearchCount."
 }
 
 $uncommonExclusionCount = ([regex]::Matches($content, '-is:uncommon')).Count
-if ($uncommonExclusionCount -ne 13) {
-    throw "Expected 13 searches to exclude Uncommon gear, found $uncommonExclusionCount."
+if ($uncommonExclusionCount -ne 12) {
+    throw "Expected 12 searches to exclude Uncommon gear, found $uncommonExclusionCount."
 }
 
 $ergoSumExclusionCount = ([regex]::Matches($content, '-exactname:"Ergo Sum"')).Count
-if ($ergoSumExclusionCount -ne 9) {
-    throw "Expected 9 searches to exclude Ergo Sum, found $ergoSumExclusionCount."
+if ($ergoSumExclusionCount -ne 8) {
+    throw "Expected 8 searches to exclude Ergo Sum, found $ergoSumExclusionCount."
 }
 
 $archiveExclusionCount = ([regex]::Matches($content, [regex]::Escape('-tag:archive'))).Count
-if ($archiveExclusionCount -ne 8) {
-    throw "Expected 8 searches to protect Archive gear, found $archiveExclusionCount."
+if ($archiveExclusionCount -ne 7) {
+    throw "Expected 7 searches to protect Archive gear, found $archiveExclusionCount."
 }
 
 $positiveArchiveCount = ([regex]::Matches($content, '(?<!-)tag:archive')).Count
@@ -92,18 +92,16 @@ if ($positiveArchiveCount -ne 3) {
 
 $junkCleanupMatch = [regex]::Match(
     $content,
-    "label:\s*'Trash Junk Below Power'.*?query:\s*\(power\)\s*=>.*?-is:locked'",
+    "label:\s*'Trash Junk'.*?query:\s*\(\)\s*=>\s*'([^']+)'",
     [System.Text.RegularExpressions.RegexOptions]::Singleline
 )
 if (-not $junkCleanupMatch.Success) {
-    throw 'Could not find the Junk below power cleanup query.'
+    throw 'Could not find the Junk cleanup query.'
 }
 
-$junkCleanupQuery = $junkCleanupMatch.Value
-foreach ($requiredFilter in @('is:equipment', 'tag:junk', 'power:<${power}', '-is:uncommon', '-exactname:"Ergo Sum"', '-tier:>=4', '-tag:favorite', '-tag:keep', '-tag:archive', '-is:locked')) {
-    if (-not $junkCleanupQuery.Contains($requiredFilter)) {
-        throw "Junk below power cleanup must include $requiredFilter."
-    }
+$junkCleanupQuery = $junkCleanupMatch.Groups[1].Value
+if ($junkCleanupQuery -ne '/* Junk Tag Trash Review */ tag:junk') {
+    throw "Junk cleanup must only search tag:junk, found: $junkCleanupQuery"
 }
 
 $weaponTierFourCleanupMatch = [regex]::Match(

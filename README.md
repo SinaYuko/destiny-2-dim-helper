@@ -4,8 +4,7 @@ The userscript adds a grouped, multi-column panel to DIM with these searches:
 
 - Trash unlocked equipment below the selected power while protecting Tier 4 and
   Tier 5 gear, Keep/Favorite tags, and locked items.
-- Find Junk-tagged equipment below the selected power while keeping the same
-  protection rules as the normal below-power trash review.
+- Find anything tagged Junk.
 - Find unlocked infusion material at or above the selected power, plus currently
   equipped gear below that power that the player may want to level up.
 - Find existing `infuse` tags below the selected power for removal while
