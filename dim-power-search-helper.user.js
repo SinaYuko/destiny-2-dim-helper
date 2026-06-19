@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DIM Power Search Helper
 // @namespace    local.destiny2helper
-// @version      1.21.0
+// @version      1.22.0
 // @description  Adds named DIM searches that automatically use your displayed maximum power.
 // @homepageURL  https://github.com/SinaYuko/destiny-2-dim-helper
 // @supportURL   https://github.com/SinaYuko/destiny-2-dim-helper/issues
@@ -72,6 +72,18 @@
       query: () =>
         '/* Armor Below Tier 5 Trash Review */ is:armor tier:<=4 ' +
         '-is:uncommon -is:exotic -tag:favorite -tag:archive',
+    },
+    {
+      label: 'Tag Tier 4 Armor Keep',
+      query: () =>
+        '/* Tier 4 Armor - Tag Keep Candidates */ is:armor tier:4 ' +
+        '-is:exotic -tag:keep -tag:favorite',
+    },
+    {
+      label: 'Tag Tier 5 Armor Favorite',
+      query: () =>
+        '/* Tier 5 Armor - Tag Favorite Candidates */ is:armor tier:5 ' +
+        '-is:exotic -tag:favorite',
     },
     {
       label: 'Archive Tier 3 Armor Singles',

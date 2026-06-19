@@ -14,6 +14,8 @@ The userscript adds a small panel to DIM with these searches:
   Archive-tagged gear.
 - Find non-Exotic armor below Tier 5 while protecting Favorite-tagged and
   Archive-tagged armor.
+- Find non-Exotic Tier 4 armor that still needs the Keep tag.
+- Find non-Exotic Tier 5 armor that still needs the Favorite tag.
 - Find non-Exotic Tier 3 armor with no duplicate copy so it can be reviewed for
   Archive tagging.
 - Find duplicate armor while excluding Favorite-tagged and Archive-tagged copies.

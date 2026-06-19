@@ -4,7 +4,7 @@ $scriptPath = Join-Path $PSScriptRoot 'dim-power-search-helper.user.js'
 $content = Get-Content -Raw -LiteralPath $scriptPath
 
 $requiredFragments = @(
-    '// @version      1.21.0'
+    '// @version      1.22.0'
     '// @updateURL    https://raw.githubusercontent.com/SinaYuko/destiny-2-dim-helper/main/dim-power-search-helper.user.js'
     '// @downloadURL  https://raw.githubusercontent.com/SinaYuko/destiny-2-dim-helper/main/dim-power-search-helper.user.js'
     '// @match        https://*.destinyitemmanager.com/*'
@@ -24,6 +24,10 @@ $requiredFragments = @(
     '-is:exotic -tag:favorite -tag:archive'
     '/* Armor Below Tier 5 Trash Review */ is:armor tier:<=4'
     '-is:uncommon -is:exotic -tag:favorite -tag:archive'
+    '/* Tier 4 Armor - Tag Keep Candidates */ is:armor tier:4'
+    '-is:exotic -tag:keep -tag:favorite'
+    '/* Tier 5 Armor - Tag Favorite Candidates */ is:armor tier:5'
+    '-is:exotic -tag:favorite'
     '/* Tier 3 Armor Without Duplicates - Archive Candidates */'
     'is:armor tier:3 -is:dupe -is:exotic -tag:favorite -tag:archive'
     '/* Duplicate Armor */ is:armor is:dupe -is:uncommon'
@@ -117,6 +121,48 @@ if (-not $armorCleanupQuery.Contains('-tag:archive')) {
 }
 if (-not $armorCleanupQuery.Contains('-is:exotic')) {
     throw 'Armor cleanup must ignore Exotics.'
+}
+
+$tierFourKeepMatch = [regex]::Match(
+    $content,
+    "label:\s*'Tag Tier 4 Armor Keep'.*?query:\s*\(\)\s*=>\s*'([^']+)'\s*\+\s*'([^']+)'",
+    [System.Text.RegularExpressions.RegexOptions]::Singleline
+)
+if (-not $tierFourKeepMatch.Success) {
+    throw 'Could not find the Tier 4 Keep-tag query.'
+}
+
+$tierFourKeepQuery = $tierFourKeepMatch.Groups[1].Value + $tierFourKeepMatch.Groups[2].Value
+foreach ($requiredFilter in @('is:armor tier:4', '-is:exotic', '-tag:keep', '-tag:favorite')) {
+    if (-not $tierFourKeepQuery.Contains($requiredFilter)) {
+        throw "Tier 4 Keep-tag candidates must include $requiredFilter."
+    }
+}
+foreach ($blockedFilter in @('-tag:archive', '-is:locked')) {
+    if ($tierFourKeepQuery.Contains($blockedFilter)) {
+        throw "Tier 4 Keep-tag candidates must not hide $blockedFilter."
+    }
+}
+
+$tierFiveFavoriteMatch = [regex]::Match(
+    $content,
+    "label:\s*'Tag Tier 5 Armor Favorite'.*?query:\s*\(\)\s*=>\s*'([^']+)'\s*\+\s*'([^']+)'",
+    [System.Text.RegularExpressions.RegexOptions]::Singleline
+)
+if (-not $tierFiveFavoriteMatch.Success) {
+    throw 'Could not find the Tier 5 Favorite-tag query.'
+}
+
+$tierFiveFavoriteQuery = $tierFiveFavoriteMatch.Groups[1].Value + $tierFiveFavoriteMatch.Groups[2].Value
+foreach ($requiredFilter in @('is:armor tier:5', '-is:exotic', '-tag:favorite')) {
+    if (-not $tierFiveFavoriteQuery.Contains($requiredFilter)) {
+        throw "Tier 5 Favorite-tag candidates must include $requiredFilter."
+    }
+}
+foreach ($blockedFilter in @('-tag:archive', '-is:locked')) {
+    if ($tierFiveFavoriteQuery.Contains($blockedFilter)) {
+        throw "Tier 5 Favorite-tag candidates must not hide $blockedFilter."
+    }
 }
 
 $archiveSinglesMatch = [regex]::Match(
