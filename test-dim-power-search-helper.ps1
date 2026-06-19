@@ -4,7 +4,7 @@ $scriptPath = Join-Path $PSScriptRoot 'dim-power-search-helper.user.js'
 $content = Get-Content -Raw -LiteralPath $scriptPath
 
 $requiredFragments = @(
-    '// @version      1.15.0'
+    '// @version      1.16.0'
     '// @updateURL    https://raw.githubusercontent.com/SinaYuko/destiny-2-dim-helper/main/dim-power-search-helper.user.js'
     '// @downloadURL  https://raw.githubusercontent.com/SinaYuko/destiny-2-dim-helper/main/dim-power-search-helper.user.js'
     '// @match        https://*.destinyitemmanager.com/*'
@@ -21,8 +21,8 @@ $requiredFragments = @(
     '/* Duplicate Weapons */ is:weapon is:dupe -is:uncommon'
     '-exactname:"Ergo Sum" -tag:favorite -tag:archive'
     '/* Unlocked Gear Below Tier 4 Trash Review */ is:equipment tier:<=3'
-    '/* Unlocked Armor Below Tier 5 Trash Review */ is:armor tier:<=4'
-    '-is:uncommon -tag:favorite -tag:archive -is:locked'
+    '/* Armor Below Tier 5 Trash Review */ is:armor tier:<=4'
+    '-is:uncommon -tag:favorite'
     '/* Duplicate Armor */ is:armor is:dupe -is:uncommon'
     '/* Archived Gear With Another Copy - Compare Tiers */ is:equipment'
     'is:dupe tag:archive tier:<=3 -is:uncommon -exactname:"Ergo Sum"'
@@ -62,8 +62,24 @@ if ($ergoSumExclusionCount -ne 9) {
 }
 
 $archiveExclusionCount = ([regex]::Matches($content, '-tag:archive')).Count
-if ($archiveExclusionCount -ne 6) {
-    throw "Expected 6 searches to protect Archive gear, found $archiveExclusionCount."
+if ($archiveExclusionCount -ne 5) {
+    throw "Expected 5 searches to protect Archive gear, found $archiveExclusionCount."
+}
+
+$armorCleanupMatch = [regex]::Match(
+    $content,
+    "label:\s*'Trash Armor Below Tier 5'.*?query:\s*\(\)\s*=>\s*'([^']+)'\s*\+\s*'([^']+)'",
+    [System.Text.RegularExpressions.RegexOptions]::Singleline
+)
+if (-not $armorCleanupMatch.Success) {
+    throw 'Could not find the armor cleanup query.'
+}
+
+$armorCleanupQuery = $armorCleanupMatch.Groups[1].Value + $armorCleanupMatch.Groups[2].Value
+foreach ($blockedProtection in @('-tag:keep', '-tag:archive', '-is:locked')) {
+    if ($armorCleanupQuery.Contains($blockedProtection)) {
+        throw "Armor cleanup must not skip $blockedProtection."
+    }
 }
 
 $moveQuery = '/* Move Unequipped Gear to Vault */ is:equipment is:movable -is:equipped -is:invault -is:postmaster'
