@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DIM Power Search Helper
 // @namespace    local.destiny2helper
-// @version      1.26.0
+// @version      1.27.0
 // @description  Adds named DIM searches that automatically use your displayed maximum power.
 // @homepageURL  https://github.com/SinaYuko/destiny-2-dim-helper
 // @supportURL   https://github.com/SinaYuko/destiny-2-dim-helper/issues
@@ -32,6 +32,15 @@
       requiresPower: true,
       query: (power) =>
         `/* Below ${power} - Unlocked Trash Review */ is:equipment power:<${power} ` +
+        '-is:uncommon -exactname:"Ergo Sum" -tier:>=4 -tag:favorite -tag:keep ' +
+        '-tag:archive -is:locked',
+    },
+    {
+      label: 'Trash Junk Below Power',
+      group: 'Power',
+      requiresPower: true,
+      query: (power) =>
+        `/* Junk Below ${power} - Trash Review */ is:equipment tag:junk power:<${power} ` +
         '-is:uncommon -exactname:"Ergo Sum" -tier:>=4 -tag:favorite -tag:keep ' +
         '-tag:archive -is:locked',
     },
