@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DIM Power Search Helper
 // @namespace    local.destiny2helper
-// @version      1.28.0
+// @version      1.29.0
 // @description  Adds named DIM searches that automatically use your displayed maximum power.
 // @homepageURL  https://github.com/SinaYuko/destiny-2-dim-helper
 // @supportURL   https://github.com/SinaYuko/destiny-2-dim-helper/issues
@@ -36,7 +36,7 @@
         '-tag:archive -is:locked',
     },
     {
-      label: 'Trash Junk',
+      label: 'Tagged Junk',
       group: 'Power',
       query: () =>
         '/* Junk Tag Trash Review */ tag:junk',

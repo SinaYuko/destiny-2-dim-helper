@@ -4,7 +4,7 @@ $scriptPath = Join-Path $PSScriptRoot 'dim-power-search-helper.user.js'
 $content = Get-Content -Raw -LiteralPath $scriptPath
 
 $requiredFragments = @(
-    '// @version      1.28.0'
+    '// @version      1.29.0'
     '// @updateURL    https://raw.githubusercontent.com/SinaYuko/destiny-2-dim-helper/main/dim-power-search-helper.user.js'
     '// @downloadURL  https://raw.githubusercontent.com/SinaYuko/destiny-2-dim-helper/main/dim-power-search-helper.user.js'
     '// @match        https://*.destinyitemmanager.com/*'
@@ -92,7 +92,7 @@ if ($positiveArchiveCount -ne 3) {
 
 $junkCleanupMatch = [regex]::Match(
     $content,
-    "label:\s*'Trash Junk'.*?query:\s*\(\)\s*=>\s*'([^']+)'",
+    "label:\s*'Tagged Junk'.*?query:\s*\(\)\s*=>\s*'([^']+)'",
     [System.Text.RegularExpressions.RegexOptions]::Singleline
 )
 if (-not $junkCleanupMatch.Success) {
