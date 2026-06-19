@@ -1,6 +1,6 @@
 # DIM Power Search Helper
 
-The userscript adds a small panel to DIM with these searches:
+The userscript adds a grouped, multi-column panel to DIM with these searches:
 
 - Trash unlocked equipment below the selected power while protecting Tier 4 and
   Tier 5 gear, Keep/Favorite tags, and locked items.

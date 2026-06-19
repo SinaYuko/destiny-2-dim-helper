@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DIM Power Search Helper
 // @namespace    local.destiny2helper
-// @version      1.24.0
+// @version      1.25.0
 // @description  Adds named DIM searches that automatically use your displayed maximum power.
 // @homepageURL  https://github.com/SinaYuko/destiny-2-dim-helper
 // @supportURL   https://github.com/SinaYuko/destiny-2-dim-helper/issues
@@ -28,6 +28,7 @@
   const searches = [
     {
       label: 'Trash Below Power',
+      group: 'Power',
       requiresPower: true,
       query: (power) =>
         `/* Below ${power} - Unlocked Trash Review */ is:equipment power:<${power} ` +
@@ -36,6 +37,7 @@
     },
     {
       label: 'Tag Infusion Gear',
+      group: 'Power',
       requiresPower: true,
       query: (power) =>
         `/* Find Infusion Gear or Equipped Gear Needing Power */ is:equipment ` +
@@ -45,6 +47,7 @@
     },
     {
       label: 'Untag Bad Infusion Gear',
+      group: 'Power',
       requiresPower: true,
       query: (power) =>
         `/* Untag Infusion Gear Below ${power} */ tag:infuse power:<${power} ` +
@@ -52,81 +55,95 @@
     },
     {
       label: 'Move Unequipped Gear to Vault',
+      group: 'Inventory',
       query: () =>
         '/* Move Unequipped Gear to Vault */ is:equipment is:movable -is:equipped -is:invault -is:postmaster',
     },
     {
       label: 'Duplicate Weapons',
+      group: 'Weapons',
       query: () =>
         '/* Duplicate Weapons */ is:weapon is:dupe -is:uncommon ' +
         '-exactname:"Ergo Sum" -tag:favorite -tag:archive',
     },
     {
       label: 'Trash Armor Below Tier 4',
+      group: 'Armor Cleanup',
       query: () =>
         '/* Armor Below Tier 4 Trash Review */ is:armor tier:<=3 ' +
         '-is:exotic -tag:favorite -tag:archive',
     },
     {
       label: 'Trash Armor Below Tier 5',
+      group: 'Armor Cleanup',
       query: () =>
         '/* Armor Below Tier 5 Trash Review */ is:armor tier:<=4 ' +
         '-is:uncommon -is:exotic -tag:favorite -tag:archive',
     },
     {
       label: 'Clean Archived Armor Below Tier 4',
+      group: 'Archived Armor',
       query: () =>
         '/* Archived Armor Below Tier 4 Cleanup */ is:armor tier:<=3 ' +
         '-is:exotic tag:archive -tag:favorite',
     },
     {
       label: 'Clean Archived Armor Below Tier 5',
+      group: 'Archived Armor',
       query: () =>
         '/* Archived Armor Below Tier 5 Cleanup */ is:armor tier:<=4 ' +
         '-is:uncommon -is:exotic tag:archive -tag:favorite',
     },
     {
       label: 'Mark Tier 4 Armor Keep',
+      group: 'Armor Tags',
       query: () =>
         '/* Tier 4 Armor - Tag Keep Candidates */ is:armor tier:4 ' +
         '-is:exotic -tag:keep -tag:favorite',
     },
     {
       label: 'Mark Tier 5 Armor Favorite',
+      group: 'Armor Tags',
       query: () =>
         '/* Tier 5 Armor - Tag Favorite Candidates */ is:armor tier:5 ' +
         '-is:exotic -tag:favorite',
     },
     {
       label: 'Archive Tier 3 Armor Singles',
+      group: 'Armor Tags',
       query: () =>
         '/* Tier 3 Armor Without Duplicates - Archive Candidates */ ' +
         'is:armor tier:3 -is:dupe -is:exotic -tag:favorite -tag:archive',
     },
     {
       label: 'Duplicate Armor',
+      group: 'Armor Review',
       query: () =>
         '/* Duplicate Armor */ is:armor is:dupe -is:uncommon ' +
         '-tag:favorite -tag:archive',
     },
     {
       label: 'Archived Gear With Replacement',
+      group: 'Armor Review',
       query: () =>
         '/* Archived Gear With Another Copy - Compare Tiers */ is:equipment ' +
         'is:dupe tag:archive tier:<=3 -is:uncommon -exactname:"Ergo Sum"',
     },
     {
       label: 'Missing Catalysts',
+      group: 'Progress',
       query: () =>
         '/* Missing Catalysts */ catalyst:missing -is:uncommon -exactname:"Ergo Sum"',
     },
     {
       label: 'Unfinished Catalysts',
+      group: 'Progress',
       query: () =>
         '/* Unfinished Catalysts */ catalyst:incomplete -is:uncommon -exactname:"Ergo Sum"',
     },
     {
       label: 'Crafted Weapons Need Levels',
+      group: 'Progress',
       query: () =>
         '/* Crafted Weapons Need Levels */ is:crafted weaponlevel:<17 -is:uncommon ' +
         '-exactname:"Ergo Sum"',
@@ -139,7 +156,7 @@
       right: 14px;
       bottom: 14px;
       z-index: 2147483647;
-      width: 250px;
+      width: min(980px, calc(100vw - 28px));
       max-height: calc(100vh - 28px);
       overflow-y: auto;
       padding: 12px;
@@ -164,6 +181,7 @@
       display: flex;
       gap: 6px;
       margin-bottom: 7px;
+      max-width: 260px;
     }
     #dim-power-search-helper input {
       min-width: 0;
@@ -176,7 +194,7 @@
     }
     #dim-power-search-helper button {
       width: 100%;
-      margin-top: 6px;
+      margin-top: 5px;
       padding: 7px;
       border: 0;
       border-radius: 4px;
@@ -192,12 +210,54 @@
       background: #50545d;
     }
     #dim-power-search-helper .dpsh-toggle {
-      width: 100%;
+      width: 180px;
       margin: 0;
       padding: 7px;
       border: 1px solid #9da4b2;
       background: #353942;
       font-size: 12px;
+    }
+    #dim-power-search-helper .dpsh-buttons {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      align-items: start;
+    }
+    #dim-power-search-helper .dpsh-section {
+      min-width: 0;
+      padding: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.04);
+    }
+    #dim-power-search-helper .dpsh-section-title {
+      margin-bottom: 3px;
+      color: #cfd5df;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    @media (max-width: 900px) {
+      #dim-power-search-helper {
+        width: min(760px, calc(100vw - 28px));
+      }
+      #dim-power-search-helper .dpsh-buttons {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+    @media (max-width: 640px) {
+      #dim-power-search-helper {
+        width: min(500px, calc(100vw - 28px));
+      }
+      #dim-power-search-helper .dpsh-buttons {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+    @media (max-width: 460px) {
+      #dim-power-search-helper .dpsh-buttons {
+        grid-template-columns: 1fr;
+      }
     }
     #dim-power-search-helper.dpsh-hidden {
       width: auto;
@@ -496,7 +556,17 @@
     });
     setPanelHidden(savedHiddenState());
 
+    const sections = new Map();
     for (const search of searches) {
+      let section = sections.get(search.group);
+      if (!section) {
+        section = document.createElement('section');
+        section.className = 'dpsh-section';
+        section.innerHTML = `<div class="dpsh-section-title">${search.group}</div>`;
+        sections.set(search.group, section);
+        buttons.appendChild(section);
+      }
+
       const button = document.createElement('button');
       button.type = 'button';
       button.textContent = search.label;
@@ -511,7 +581,7 @@
           runSearch(search.query(power));
         }
       });
-      buttons.appendChild(button);
+      section.appendChild(button);
     }
 
     panel.querySelector('.dpsh-detect').addEventListener('click', () => {
