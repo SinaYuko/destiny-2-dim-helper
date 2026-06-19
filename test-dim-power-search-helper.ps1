@@ -4,7 +4,7 @@ $scriptPath = Join-Path $PSScriptRoot 'dim-power-search-helper.user.js'
 $content = Get-Content -Raw -LiteralPath $scriptPath
 
 $requiredFragments = @(
-    '// @version      1.14.0'
+    '// @version      1.15.0'
     '// @updateURL    https://raw.githubusercontent.com/SinaYuko/destiny-2-dim-helper/main/dim-power-search-helper.user.js'
     '// @downloadURL  https://raw.githubusercontent.com/SinaYuko/destiny-2-dim-helper/main/dim-power-search-helper.user.js'
     '// @match        https://*.destinyitemmanager.com/*'
@@ -22,7 +22,7 @@ $requiredFragments = @(
     '-exactname:"Ergo Sum" -tag:favorite -tag:archive'
     '/* Unlocked Gear Below Tier 4 Trash Review */ is:equipment tier:<=3'
     '/* Unlocked Armor Below Tier 5 Trash Review */ is:armor tier:<=4'
-    '-is:uncommon -tag:favorite -tag:keep -tag:archive -is:locked'
+    '-is:uncommon -tag:favorite -tag:archive -is:locked'
     '/* Duplicate Armor */ is:armor is:dupe -is:uncommon'
     '/* Archived Gear With Another Copy - Compare Tiers */ is:equipment'
     'is:dupe tag:archive tier:<=3 -is:uncommon -exactname:"Ergo Sum"'

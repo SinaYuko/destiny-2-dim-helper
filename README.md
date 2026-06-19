@@ -12,8 +12,8 @@ The userscript adds a small panel to DIM with these searches:
 - Find duplicate weapons while excluding Favorite-tagged copies.
 - Find unlocked equipment below Tier 4 while protecting Keep/Favorite tags,
   Archive tags, locked items, and Ergo Sum.
-- Find unlocked armor below Tier 5 while protecting Keep/Favorite tags, Archive
-  tags, and locked items.
+- Find unlocked armor below Tier 5 while protecting Favorite tags, Archive tags,
+  and locked items.
 - Find duplicate armor while excluding Favorite-tagged and Archive-tagged copies.
 - Find archived Tier 1-3 gear that has another copy for replacement review.
 - Find weapons with missing catalysts.
