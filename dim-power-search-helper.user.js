@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DIM Power Search Helper
 // @namespace    local.destiny2helper
-// @version      1.18.0
+// @version      1.19.0
 // @description  Adds named DIM searches that automatically use your displayed maximum power.
 // @homepageURL  https://github.com/SinaYuko/destiny-2-dim-helper
 // @supportURL   https://github.com/SinaYuko/destiny-2-dim-helper/issues
@@ -64,7 +64,7 @@
     {
       label: 'Trash Below Tier 4',
       query: () =>
-        '/* Gear Below Tier 4 Trash Review */ is:equipment tier:<=3 ' +
+        '/* Armor Below Tier 4 Trash Review */ is:armor tier:<=3 ' +
         '-is:exotic -tag:favorite',
     },
     {

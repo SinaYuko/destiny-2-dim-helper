@@ -4,7 +4,7 @@ $scriptPath = Join-Path $PSScriptRoot 'dim-power-search-helper.user.js'
 $content = Get-Content -Raw -LiteralPath $scriptPath
 
 $requiredFragments = @(
-    '// @version      1.18.0'
+    '// @version      1.19.0'
     '// @updateURL    https://raw.githubusercontent.com/SinaYuko/destiny-2-dim-helper/main/dim-power-search-helper.user.js'
     '// @downloadURL  https://raw.githubusercontent.com/SinaYuko/destiny-2-dim-helper/main/dim-power-search-helper.user.js'
     '// @match        https://*.destinyitemmanager.com/*'
@@ -20,7 +20,7 @@ $requiredFragments = @(
     '/* Move Unequipped Gear to Vault */ is:equipment is:movable -is:equipped -is:invault -is:postmaster'
     '/* Duplicate Weapons */ is:weapon is:dupe -is:uncommon'
     '-exactname:"Ergo Sum" -tag:favorite -tag:archive'
-    '/* Gear Below Tier 4 Trash Review */ is:equipment tier:<=3'
+    '/* Armor Below Tier 4 Trash Review */ is:armor tier:<=3'
     '-is:exotic -tag:favorite'
     '/* Armor Below Tier 5 Trash Review */ is:armor tier:<=4'
     '-is:uncommon -is:exotic -tag:favorite'
@@ -84,6 +84,12 @@ foreach ($blockedProtection in @('-is:uncommon', '-exactname:"Ergo Sum"', '-tag:
 }
 if (-not $tierFourCleanupQuery.Contains('-is:exotic')) {
     throw 'Tier 4 cleanup must ignore Exotics.'
+}
+if (-not $tierFourCleanupQuery.Contains('is:armor tier:<=3')) {
+    throw 'Tier 4 cleanup must be armor-only.'
+}
+if ($tierFourCleanupQuery.Contains('is:equipment')) {
+    throw 'Tier 4 cleanup must not target all equipment.'
 }
 
 $armorCleanupMatch = [regex]::Match(
