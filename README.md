@@ -14,6 +14,10 @@ The userscript adds a small panel to DIM with these searches:
   Archive-tagged gear.
 - Find non-Exotic armor below Tier 5 while protecting Favorite-tagged and
   Archive-tagged armor.
+- Find archived non-Exotic armor below Tier 4 when you are ready to clean up
+  outdated stopgap pieces.
+- Find archived non-Exotic armor below Tier 5 when you want a broader archived
+  armor cleanup pass.
 - Find non-Exotic Tier 4 armor that still needs the Keep tag.
 - Find non-Exotic Tier 5 armor that still needs the Favorite tag.
 - Find non-Exotic Tier 3 armor with no duplicate copy so it can be reviewed for
@@ -30,9 +34,11 @@ general equipment review searches also exclude Ergo Sum with
 includes both so they can still be returned to the vault.
 
 The `archive` tag means the item is intentionally retained until a higher-tier
-replacement drops. Trash, infusion-candidate, and duplicate-review searches
-therefore exclude `tag:archive`. The infusion-tag cleanup search does not exclude
-Archive gear, allowing an accidental `infuse` tag to be found and removed.
+replacement drops. Normal trash, infusion-candidate, and duplicate-review
+searches therefore exclude `tag:archive`. The archived armor cleanup searches
+intentionally include `tag:archive` so outdated stopgap armor can be reviewed
+later. The infusion-tag cleanup search does not exclude Archive gear, allowing an
+accidental `infuse` tag to be found and removed.
 
 The archived-replacement search uses `is:dupe tag:archive tier:<=3`. DIM can
 confirm that another copy exists, but its search language cannot confirm that the

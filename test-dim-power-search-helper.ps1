@@ -4,7 +4,7 @@ $scriptPath = Join-Path $PSScriptRoot 'dim-power-search-helper.user.js'
 $content = Get-Content -Raw -LiteralPath $scriptPath
 
 $requiredFragments = @(
-    '// @version      1.23.0'
+    '// @version      1.24.0'
     '// @updateURL    https://raw.githubusercontent.com/SinaYuko/destiny-2-dim-helper/main/dim-power-search-helper.user.js'
     '// @downloadURL  https://raw.githubusercontent.com/SinaYuko/destiny-2-dim-helper/main/dim-power-search-helper.user.js'
     '// @match        https://*.destinyitemmanager.com/*'
@@ -24,6 +24,10 @@ $requiredFragments = @(
     '-is:exotic -tag:favorite -tag:archive'
     '/* Armor Below Tier 5 Trash Review */ is:armor tier:<=4'
     '-is:uncommon -is:exotic -tag:favorite -tag:archive'
+    '/* Archived Armor Below Tier 4 Cleanup */ is:armor tier:<=3'
+    '-is:exotic tag:archive -tag:favorite'
+    '/* Archived Armor Below Tier 5 Cleanup */ is:armor tier:<=4'
+    '-is:uncommon -is:exotic tag:archive -tag:favorite'
     '/* Tier 4 Armor - Tag Keep Candidates */ is:armor tier:4'
     '-is:exotic -tag:keep -tag:favorite'
     '/* Tier 5 Armor - Tag Favorite Candidates */ is:armor tier:5'
@@ -59,8 +63,8 @@ if ($powerSearchCount -ne 3) {
 }
 
 $uncommonExclusionCount = ([regex]::Matches($content, '-is:uncommon')).Count
-if ($uncommonExclusionCount -ne 10) {
-    throw "Expected 10 searches to exclude Uncommon gear, found $uncommonExclusionCount."
+if ($uncommonExclusionCount -ne 11) {
+    throw "Expected 11 searches to exclude Uncommon gear, found $uncommonExclusionCount."
 }
 
 $ergoSumExclusionCount = ([regex]::Matches($content, '-exactname:"Ergo Sum"')).Count
@@ -68,9 +72,14 @@ if ($ergoSumExclusionCount -ne 8) {
     throw "Expected 8 searches to exclude Ergo Sum, found $ergoSumExclusionCount."
 }
 
-$archiveExclusionCount = ([regex]::Matches($content, '-tag:archive')).Count
+$archiveExclusionCount = ([regex]::Matches($content, [regex]::Escape('-tag:archive'))).Count
 if ($archiveExclusionCount -ne 7) {
     throw "Expected 7 searches to protect Archive gear, found $archiveExclusionCount."
+}
+
+$positiveArchiveCount = ([regex]::Matches($content, '(?<!-)tag:archive')).Count
+if ($positiveArchiveCount -ne 3) {
+    throw "Expected 3 searches to intentionally include Archive gear, found $positiveArchiveCount."
 }
 
 $tierFourCleanupMatch = [regex]::Match(
@@ -121,6 +130,44 @@ if (-not $armorCleanupQuery.Contains('-tag:archive')) {
 }
 if (-not $armorCleanupQuery.Contains('-is:exotic')) {
     throw 'Armor cleanup must ignore Exotics.'
+}
+
+$archivedTierFourCleanupMatch = [regex]::Match(
+    $content,
+    "label:\s*'Clean Archived Armor Below Tier 4'.*?query:\s*\(\)\s*=>\s*'([^']+)'\s*\+\s*'([^']+)'",
+    [System.Text.RegularExpressions.RegexOptions]::Singleline
+)
+if (-not $archivedTierFourCleanupMatch.Success) {
+    throw 'Could not find the archived Tier 4 cleanup query.'
+}
+
+$archivedTierFourCleanupQuery = $archivedTierFourCleanupMatch.Groups[1].Value + $archivedTierFourCleanupMatch.Groups[2].Value
+foreach ($requiredFilter in @('is:armor tier:<=3', '-is:exotic', 'tag:archive', '-tag:favorite')) {
+    if (-not $archivedTierFourCleanupQuery.Contains($requiredFilter)) {
+        throw "Archived Tier 4 cleanup must include $requiredFilter."
+    }
+}
+if ($archivedTierFourCleanupQuery.Contains('-is:locked')) {
+    throw 'Archived Tier 4 cleanup must not hide locked armor.'
+}
+
+$archivedTierFiveCleanupMatch = [regex]::Match(
+    $content,
+    "label:\s*'Clean Archived Armor Below Tier 5'.*?query:\s*\(\)\s*=>\s*'([^']+)'\s*\+\s*'([^']+)'",
+    [System.Text.RegularExpressions.RegexOptions]::Singleline
+)
+if (-not $archivedTierFiveCleanupMatch.Success) {
+    throw 'Could not find the archived Tier 5 cleanup query.'
+}
+
+$archivedTierFiveCleanupQuery = $archivedTierFiveCleanupMatch.Groups[1].Value + $archivedTierFiveCleanupMatch.Groups[2].Value
+foreach ($requiredFilter in @('is:armor tier:<=4', '-is:uncommon', '-is:exotic', 'tag:archive', '-tag:favorite')) {
+    if (-not $archivedTierFiveCleanupQuery.Contains($requiredFilter)) {
+        throw "Archived Tier 5 cleanup must include $requiredFilter."
+    }
+}
+if ($archivedTierFiveCleanupQuery.Contains('-is:locked')) {
+    throw 'Archived Tier 5 cleanup must not hide locked armor.'
 }
 
 $tierFourKeepMatch = [regex]::Match(
