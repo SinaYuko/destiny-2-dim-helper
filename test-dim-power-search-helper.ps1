@@ -4,7 +4,7 @@ $scriptPath = Join-Path $PSScriptRoot 'dim-power-search-helper.user.js'
 $content = Get-Content -Raw -LiteralPath $scriptPath
 
 $requiredFragments = @(
-    '// @version      1.25.0'
+    '// @version      1.26.0'
     '// @updateURL    https://raw.githubusercontent.com/SinaYuko/destiny-2-dim-helper/main/dim-power-search-helper.user.js'
     '// @downloadURL  https://raw.githubusercontent.com/SinaYuko/destiny-2-dim-helper/main/dim-power-search-helper.user.js'
     '// @match        https://*.destinyitemmanager.com/*'
@@ -20,6 +20,10 @@ $requiredFragments = @(
     '/* Move Unequipped Gear to Vault */ is:equipment is:movable -is:equipped -is:invault -is:postmaster'
     '/* Duplicate Weapons */ is:weapon is:dupe -is:uncommon'
     '-exactname:"Ergo Sum" -tag:favorite -tag:archive'
+    '/* Weapons Below Tier 4 Trash Review */ is:weapon tier:<=3'
+    '-is:exotic -tag:favorite'
+    '/* Weapons Below Tier 5 Trash Review */ is:weapon tier:<=4'
+    '-is:uncommon -is:exotic -tag:favorite'
     '/* Armor Below Tier 4 Trash Review */ is:armor tier:<=3'
     '-is:exotic -tag:favorite -tag:archive'
     '/* Armor Below Tier 5 Trash Review */ is:armor tier:<=4'
@@ -66,8 +70,8 @@ if ($powerSearchCount -ne 3) {
 }
 
 $uncommonExclusionCount = ([regex]::Matches($content, '-is:uncommon')).Count
-if ($uncommonExclusionCount -ne 11) {
-    throw "Expected 11 searches to exclude Uncommon gear, found $uncommonExclusionCount."
+if ($uncommonExclusionCount -ne 12) {
+    throw "Expected 12 searches to exclude Uncommon gear, found $uncommonExclusionCount."
 }
 
 $ergoSumExclusionCount = ([regex]::Matches($content, '-exactname:"Ergo Sum"')).Count
@@ -83,6 +87,48 @@ if ($archiveExclusionCount -ne 7) {
 $positiveArchiveCount = ([regex]::Matches($content, '(?<!-)tag:archive')).Count
 if ($positiveArchiveCount -ne 3) {
     throw "Expected 3 searches to intentionally include Archive gear, found $positiveArchiveCount."
+}
+
+$weaponTierFourCleanupMatch = [regex]::Match(
+    $content,
+    "label:\s*'Trash Weapons Below Tier 4'.*?query:\s*\(\)\s*=>\s*'([^']+)'\s*\+\s*'([^']+)'",
+    [System.Text.RegularExpressions.RegexOptions]::Singleline
+)
+if (-not $weaponTierFourCleanupMatch.Success) {
+    throw 'Could not find the weapon Tier 4 cleanup query.'
+}
+
+$weaponTierFourCleanupQuery = $weaponTierFourCleanupMatch.Groups[1].Value + $weaponTierFourCleanupMatch.Groups[2].Value
+foreach ($requiredFilter in @('is:weapon tier:<=3', '-is:exotic', '-tag:favorite')) {
+    if (-not $weaponTierFourCleanupQuery.Contains($requiredFilter)) {
+        throw "Weapon Tier 4 cleanup must include $requiredFilter."
+    }
+}
+foreach ($blockedFilter in @('-tag:archive', '-tag:keep', '-is:locked', '-exactname:"Ergo Sum"')) {
+    if ($weaponTierFourCleanupQuery.Contains($blockedFilter)) {
+        throw "Weapon Tier 4 cleanup must not hide $blockedFilter."
+    }
+}
+
+$weaponTierFiveCleanupMatch = [regex]::Match(
+    $content,
+    "label:\s*'Trash Weapons Below Tier 5'.*?query:\s*\(\)\s*=>\s*'([^']+)'\s*\+\s*'([^']+)'",
+    [System.Text.RegularExpressions.RegexOptions]::Singleline
+)
+if (-not $weaponTierFiveCleanupMatch.Success) {
+    throw 'Could not find the weapon Tier 5 cleanup query.'
+}
+
+$weaponTierFiveCleanupQuery = $weaponTierFiveCleanupMatch.Groups[1].Value + $weaponTierFiveCleanupMatch.Groups[2].Value
+foreach ($requiredFilter in @('is:weapon tier:<=4', '-is:uncommon', '-is:exotic', '-tag:favorite')) {
+    if (-not $weaponTierFiveCleanupQuery.Contains($requiredFilter)) {
+        throw "Weapon Tier 5 cleanup must include $requiredFilter."
+    }
+}
+foreach ($blockedFilter in @('-tag:archive', '-tag:keep', '-is:locked', '-exactname:"Ergo Sum"')) {
+    if ($weaponTierFiveCleanupQuery.Contains($blockedFilter)) {
+        throw "Weapon Tier 5 cleanup must not hide $blockedFilter."
+    }
 }
 
 $tierFourCleanupMatch = [regex]::Match(
